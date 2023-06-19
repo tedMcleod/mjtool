@@ -32,12 +32,13 @@ export function lint(student: student, oldest: submission | null, newest: submis
 
 
     const start = correctStart(student)
-    for (const fileName of newest?.file_names || []) {
-        if (!fileName.startsWith(start)) {
-            ret += "NAMING: file '" + fileName + "' does not start with '" + start + "'. "
+    if (newest !== null) {
+        for (const fileName of Object.keys(newest.map)) {
+            if (!fileName.startsWith(start)) {
+                ret += "NAMING: file '" + fileName + "' does not start with '" + start + "'. "
+            }
         }
     }
-
     return ret
 }
 
@@ -66,8 +67,8 @@ export default async function spreadsheetLine(credentials : api_credentials, stu
     const oldest : submission | null = student.submissions.length > 0 ? student.submissions[student.submissions.length - 1] : null
     const newest : submission | null = student.submissions.length > 0 ? student.submissions[0] : null
 
-    const oldestFilenames = oldest ? oldest.file_names : []
-    const newestFilenames = newest ? newest.file_names : []
+    const oldestFilenames = oldest ? Object.keys(oldest.map) : []
+    const newestFilenames = newest ? Object.keys(newest.map) : []
 
     const ref = student.ref
 

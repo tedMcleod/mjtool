@@ -1,5 +1,5 @@
 import { landing_single_state, landing_state } from "../landing/state_provider";
-import { api_credentials, assignment_meta, downloadURL, queryFilenames, queryMetadataPreliminaryFilter, queryRoster, roster_meta, safePath, student_meta, submission_meta } from "../../util/proxy";
+import { api_credentials, assignment_meta, downloadURL, queryFileMap, queryMetadataPreliminaryFilter, queryRoster, roster_meta, safePath, student_meta, submission_meta } from "../../util/proxy";
 import spreadsheetLine, { spreadsheetHeader } from "./spreadsheet_manager";
 import { main_state } from "./main";
 
@@ -30,8 +30,7 @@ export type student = {
 export type submission = {
     student : student
     ref : submission_meta
-
-    file_names : string[]
+    map : {[file_name : string] : string}
 }
 
 function validSubmissionFor(submission_meta : submission_meta, state : main_state) : boolean {
@@ -56,7 +55,7 @@ function secondaryValidSubmissionFor(submission : submission, search : string) :
     const roster = submission.student.roster.ref
     const assignment = submission.student.roster.assignment.ref
 
-    const matchAgainst = submission.file_names
+    const matchAgainst = Object.keys(submission.map)
         .concat(submission.ref.comment, [student.first, student.last], [roster.teacher], [assignment.name])
         .map(x => x.toLowerCase())
     
@@ -110,18 +109,17 @@ export async function downloadSubmission(submission: submission, state: landing_
 
     
     const basePath = path.join(state.export_root, safePath(assignment), teacher + '-' + period)
-    const credentials : api_credentials = {
-        key : state.api_password,
-        url : state.api_url
-    }
-
-    for (const fileName of submission.file_names) {
-        await downloadFile(credentials, submission, fileName, basePath)        
+    for (const fileName of Object.keys(submission.map)) {
+        const fileCredentials : api_credentials = {
+            key : submission.map[fileName],
+            url : state.api_url
+        }
+        await downloadFile(fileCredentials, submission, fileName, basePath)        
     }
 
     // open the folder
     if (open) {
-        shell.showItemInFolder(path.join(basePath, submission.file_names[0]))
+        shell.showItemInFolder(path.join(basePath, Object.keys(submission.map)[0]))
     }
 }
 
@@ -223,8 +221,8 @@ export async function categorize(meta : submission_meta[], credentials: api_cred
         const student = assignmentSkeleton[lesson].map[roster].map[studentID]
 
 
-        const fileNames = await queryFilenames(credentials, sub, student);
-        const submission : submission = {ref: sub, student: student, file_names: fileNames}
+        const fileMap = await queryFileMap(credentials, sub, student);
+        const submission : submission = {ref: sub, student: student, map: fileMap}
         if (secondaryValidSubmissionFor(submission, search)) {
             student.submissions.push(submission)
         }

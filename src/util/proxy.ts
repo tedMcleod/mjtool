@@ -97,15 +97,19 @@ export function safePath(path: string) {
 }
 
 export function downloadURL(credentials: api_credentials, submission: submission, fileName: string) : string {
-    return url_for(credentials, '/submissions/' + submission.student.roster.assignment.ref.path + '/' + submission.student.ref.id + '/' + submission.ref.version + '/' + fileName)
+    const fileCredentials : api_credentials = {
+        key : submission.map[fileName],
+        url : credentials.url
+    }
+    return url_for(fileCredentials, '/submissions/' + submission.student.roster.assignment.ref.path + '/' + submission.student.ref.id + '/' + submission.ref.version + '/' + fileName)
 }
 
-export async function queryFilenames(credentials: api_credentials, submission: submission_meta, student: student) : Promise<string[]> {
+export async function queryFileMap(credentials: api_credentials, submission: submission_meta, student: student) : Promise<{[file_name : string] : string}> {
     // TODO change to sid at some point
     const url = url_for(credentials, '/submissions/listdir/' + student.roster.assignment.ref.path + '/' + student.ref.id + '/' + submission.version)
 
     try {
-        const json : string[] = await (await fetch(url)).json()
+        const json : {[file_name : string] : string} = await (await fetch(url)).json()
         return json
     } catch (err: any) {
         console.error("Error", err)
