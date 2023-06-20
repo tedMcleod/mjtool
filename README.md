@@ -19,12 +19,20 @@ Ordered view is nice for grouping submissions by class period and the assignment
 - See bottom of page for building and running source code
 - Latest releases also available on right hand side under "Releases column"
 
-Download Links
-- mac: https://github.com/tedMcleod/mjtool/releases/download/1.0.0/mjtool.mac.zip
-- windows: https://github.com/tedMcleod/mjtool/releases/download/1.0.0/mjtool.windows.zip
+## Download Links
+- [Download the executable applications here](https://github.com/tedMcleod/mjtool/releases/)
 
-For mac, unzip the download and simply open the "mjtool.app" file
-For windows, unzip the download and navigate to the "mjtool.exe" file and run it. This is likely under the "mjtool-win32-x64" folder.
+For mac:
+
+    - unzip the download
+    - (optional) move the "mjtool.app" file to Applications.
+    - open mjtool.app
+    
+For windows:
+
+    - unzip the download
+    - (optional) move the "mjtool-win32-x64" folder to C:\Program Files
+    - navigate to the "mjtool.exe" file in the "mjtool-win32-x64" folder and run it.
 
 **You may be warned that the app is unrecognized, run it anyways**
 
